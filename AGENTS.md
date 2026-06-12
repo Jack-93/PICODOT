@@ -33,7 +33,7 @@
 
 - Test with VS Code Live Server, not only by opening `file://`.
 - Check desktop and mobile layouts.
-- Verify image upload, drag and drop, reset, controls, and PNG download.
+- Verify the image picker, drag and drop, reset, controls, and PNG download.
 - Check the browser console for errors.
 - Do not claim that uploaded images are sent to a server unless the implementation changes.
 

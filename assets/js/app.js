@@ -3,17 +3,17 @@
 
   var elements = {
     fileInput: document.querySelector("[data-file-input]"),
+    fileButton: document.querySelector("[data-file-button]"),
     dropZone: document.querySelector("[data-drop-zone]"),
     uploadPrompt: document.querySelector("[data-upload-prompt]"),
     canvas: document.querySelector("[data-output-canvas]"),
     canvasBadge: document.querySelector("[data-canvas-badge]"),
     pixelSize: document.querySelector("[data-pixel-size]"),
     colorCount: document.querySelector("[data-color-count]"),
-    saturation: document.querySelector("[data-saturation]"),
-    gridToggle: document.querySelector("[data-grid-toggle]"),
+    colorDiversity: document.querySelector("[data-color-diversity]"),
     pixelOutput: document.querySelector("[data-pixel-output]"),
     colorOutput: document.querySelector("[data-color-output]"),
-    saturationOutput: document.querySelector("[data-saturation-output]"),
+    diversityOutput: document.querySelector("[data-diversity-output]"),
     download: document.querySelector("[data-download]"),
     reset: document.querySelector("[data-reset]"),
     status: document.querySelector("[data-status]")
@@ -133,8 +133,7 @@
     return {
       pixelWidth: Number(elements.pixelSize.value),
       colors: Number(elements.colorCount.value),
-      saturation: Number(elements.saturation.value) / 100,
-      showGrid: elements.gridToggle.checked
+      colorDiversity: Number(elements.colorDiversity.value) / 100
     };
   }
 
@@ -148,23 +147,131 @@
     ];
   }
 
+  function getChannelRange(colors, channel) {
+    var minimum = 255;
+    var maximum = 0;
+
+    colors.forEach(function (color) {
+      minimum = Math.min(minimum, color[channel]);
+      maximum = Math.max(maximum, color[channel]);
+    });
+
+    return maximum - minimum;
+  }
+
+  function createPalette(data, colorCount) {
+    var colors = [];
+
+    for (var index = 0; index < data.length; index += 4) {
+      colors.push([data[index], data[index + 1], data[index + 2]]);
+    }
+
+    var boxes = [colors];
+
+    while (boxes.length < colorCount) {
+      var boxIndex = -1;
+      var channelIndex = 0;
+      var largestScore = -1;
+
+      boxes.forEach(function (box, index) {
+        if (box.length < 2) {
+          return;
+        }
+
+        var ranges = [
+          getChannelRange(box, 0),
+          getChannelRange(box, 1),
+          getChannelRange(box, 2)
+        ];
+        var maxRange = Math.max.apply(null, ranges);
+        var score = maxRange * box.length;
+
+        if (score > largestScore) {
+          largestScore = score;
+          boxIndex = index;
+          channelIndex = ranges.indexOf(maxRange);
+        }
+      });
+
+      if (boxIndex === -1) {
+        break;
+      }
+
+      var boxToSplit = boxes.splice(boxIndex, 1)[0];
+      boxToSplit.sort(function (first, second) {
+        return first[channelIndex] - second[channelIndex];
+      });
+
+      var middle = Math.ceil(boxToSplit.length / 2);
+      boxes.push(boxToSplit.slice(0, middle), boxToSplit.slice(middle));
+    }
+
+    return boxes.map(function (box) {
+      var totals = box.reduce(function (result, color) {
+        result[0] += color[0];
+        result[1] += color[1];
+        result[2] += color[2];
+        return result;
+      }, [0, 0, 0]);
+
+      return totals.map(function (total) {
+        return Math.round(total / box.length);
+      });
+    });
+  }
+
+  function findNearestColor(red, green, blue, palette) {
+    var nearest = palette[0];
+    var nearestDistance = Infinity;
+
+    palette.forEach(function (color) {
+      var redDifference = red - color[0];
+      var greenDifference = green - color[1];
+      var blueDifference = blue - color[2];
+      var distance =
+        redDifference * redDifference +
+        greenDifference * greenDifference +
+        blueDifference * blueDifference;
+
+      if (distance < nearestDistance) {
+        nearest = color;
+        nearestDistance = distance;
+      }
+    });
+
+    return nearest;
+  }
+
   function processPixels(context, width, height, settings) {
     var imageData = context.getImageData(0, 0, width, height);
     var data = imageData.data;
-    var levels = Math.max(2, Math.round(Math.cbrt(settings.colors)));
-    var step = 255 / (levels - 1);
 
     for (var index = 0; index < data.length; index += 4) {
       var saturated = adjustSaturation(
         data[index],
         data[index + 1],
         data[index + 2],
-        settings.saturation
+        settings.colorDiversity
       );
 
-      data[index] = Math.round(saturated[0] / step) * step;
-      data[index + 1] = Math.round(saturated[1] / step) * step;
-      data[index + 2] = Math.round(saturated[2] / step) * step;
+      data[index] = saturated[0];
+      data[index + 1] = saturated[1];
+      data[index + 2] = saturated[2];
+    }
+
+    var palette = createPalette(data, settings.colors);
+
+    for (var pixelIndex = 0; pixelIndex < data.length; pixelIndex += 4) {
+      var nearest = findNearestColor(
+        data[pixelIndex],
+        data[pixelIndex + 1],
+        data[pixelIndex + 2],
+        palette
+      );
+
+      data[pixelIndex] = nearest[0];
+      data[pixelIndex + 1] = nearest[1];
+      data[pixelIndex + 2] = nearest[2];
     }
 
     context.putImageData(imageData, 0, 0);
@@ -199,27 +306,6 @@
     outputContext.clearRect(0, 0, outputWidth, outputHeight);
     outputContext.drawImage(smallCanvas, 0, 0, outputWidth, outputHeight);
 
-    if (settings.showGrid) {
-      var cellWidth = outputWidth / smallWidth;
-      var cellHeight = outputHeight / smallHeight;
-
-      outputContext.strokeStyle = "rgba(37, 37, 31, 0.14)";
-      outputContext.lineWidth = 1;
-      outputContext.beginPath();
-
-      for (var x = 1; x < smallWidth; x += 1) {
-        outputContext.moveTo(Math.round(x * cellWidth) + 0.5, 0);
-        outputContext.lineTo(Math.round(x * cellWidth) + 0.5, outputHeight);
-      }
-
-      for (var y = 1; y < smallHeight; y += 1) {
-        outputContext.moveTo(0, Math.round(y * cellHeight) + 0.5);
-        outputContext.lineTo(outputWidth, Math.round(y * cellHeight) + 0.5);
-      }
-
-      outputContext.stroke();
-    }
-
     elements.canvas.style.aspectRatio = sourceWidth + " / " + sourceHeight;
     elements.canvas.classList.add("is-visible");
     elements.uploadPrompt.classList.add("is-hidden");
@@ -233,7 +319,7 @@
 
     elements.pixelOutput.textContent = elements.pixelSize.value;
     elements.colorOutput.textContent = elements.colorCount.value;
-    elements.saturationOutput.textContent = elements.saturation.value + "%";
+    elements.diversityOutput.textContent = elements.colorDiversity.value + "%";
   }
 
   function handleFile(file) {
@@ -277,9 +363,8 @@
     state.isSample = true;
     elements.fileInput.value = "";
     elements.pixelSize.value = "48";
-    elements.colorCount.value = "12";
-    elements.saturation.value = "110";
-    elements.gridToggle.checked = false;
+    elements.colorCount.value = "16";
+    elements.colorDiversity.value = "110";
     updateOutputs();
     renderPixelArt();
     setStatus("샘플 이미지가 준비되어 있어요.");
@@ -342,17 +427,8 @@
       return;
     }
 
-    elements.dropZone.addEventListener("click", function (event) {
-      if (event.target !== elements.fileInput) {
-        elements.fileInput.click();
-      }
-    });
-
-    elements.dropZone.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        elements.fileInput.click();
-      }
+    elements.fileButton.addEventListener("click", function () {
+      elements.fileInput.click();
     });
 
     elements.fileInput.addEventListener("change", function () {
@@ -377,14 +453,13 @@
       handleFile(event.dataTransfer.files[0]);
     });
 
-    [elements.pixelSize, elements.colorCount, elements.saturation].forEach(function (control) {
+    [elements.pixelSize, elements.colorCount, elements.colorDiversity].forEach(function (control) {
       control.addEventListener("input", function () {
         updateOutputs();
         renderPixelArt();
       });
     });
 
-    elements.gridToggle.addEventListener("change", renderPixelArt);
     elements.download.addEventListener("click", downloadImage);
     elements.reset.addEventListener("click", resetMaker);
 

@@ -385,6 +385,11 @@
 
   function loadAdSense() {
     var config = window.PICO_DOT_CONFIG;
+    var adContainers = document.querySelectorAll("[data-ad-container]");
+
+    adContainers.forEach(function (container) {
+      container.hidden = true;
+    });
 
     if (!config || !config.adsenseClient) {
       return;
@@ -409,6 +414,7 @@
         return;
       }
 
+      var adContainer = container.closest("[data-ad-container]");
       var ad = document.createElement("ins");
       ad.className = "adsbygoogle";
       ad.style.display = "block";
@@ -418,6 +424,7 @@
       ad.dataset.fullWidthResponsive = "true";
 
       container.replaceChildren(ad);
+      adContainer.hidden = false;
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     });
   }

@@ -1158,6 +1158,7 @@ input[type="range"]::-moz-range-thumb {
 
 .footer-main > div:first-child p {
   max-width: 400px;
+  margin: 16px 0 0;
   color: var(--muted);
   font-size: 13px;
 }
@@ -1187,6 +1188,45 @@ input[type="range"]::-moz-range-thumb {
 .footer-links a:hover {
   color: var(--ink);
   text-decoration: underline;
+}
+
+.developer-info {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  width: min(100%, 460px);
+  margin-top: 28px;
+  padding: 24px 26px;
+  border: 2px solid var(--ink);
+  background: var(--lime);
+  box-shadow: 6px 6px 0 var(--ink);
+  gap: 7px;
+}
+
+.developer-info a {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.3vw, 14px);
+  font-weight: 700;
+}
+
+.developer-info strong {
+  font-size: clamp(20px, 2.5vw, 29px);
+  letter-spacing: -0.04em;
+}
+
+.developer-role {
+  margin-bottom: 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.developer-message {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 800;
 }
 
 .footer-bottom {

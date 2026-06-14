@@ -173,6 +173,20 @@
                         </div>
                     </div>
 
+                    <div class="preview-switcher" role="group" aria-label="미리보기 방식">
+                        <span>미리보기</span>
+                        <div>
+                            <button class="preview-button is-active"
+                                    type="button"
+                                    aria-pressed="true"
+                                    data-preview-mode="result">도트 결과</button>
+                            <button class="preview-button"
+                                    type="button"
+                                    aria-pressed="false"
+                                    data-preview-mode="original">원본 보기</button>
+                        </div>
+                    </div>
+
                     <div class="drop-zone"
                          data-drop-zone
                          aria-label="사진 미리보기 및 드래그 앤 드롭 영역">
@@ -186,7 +200,12 @@
                             <span>또는 여기에 JPG, PNG, WEBP 파일을 놓아주세요</span>
                             <small>권장 크기 1200 × 1200px · 최대 10MB</small>
                         </div>
-                        <canvas data-output-canvas aria-label="변환된 픽셀 아트 미리보기"></canvas>
+                        <canvas class="result-canvas"
+                                data-output-canvas
+                                aria-label="변환된 픽셀 아트 미리보기"></canvas>
+                        <canvas class="original-canvas"
+                                data-original-canvas
+                                aria-label="선택한 원본 사진 미리보기"></canvas>
                         <div class="canvas-badge" data-canvas-badge>샘플 미리보기</div>
                     </div>
                     <p class="file-summary" data-file-summary aria-live="polite">
@@ -199,6 +218,37 @@
                         <div>
                             <span class="step-number">02</span>
                             <h3>느낌 조절</h3>
+                        </div>
+                    </div>
+
+                    <div class="preset-group">
+                        <div class="preset-heading">
+                            <strong>빠른 프리셋</strong>
+                            <span>시작 설정을 골라보세요</span>
+                        </div>
+                        <div class="preset-buttons" role="group" aria-label="빠른 프리셋">
+                            <button type="button"
+                                    data-preset="retro"
+                                    data-pixel="28"
+                                    data-colors="8"
+                                    data-diversity="85">
+                                <strong>레트로</strong><span>굵고 단순하게</span>
+                            </button>
+                            <button class="is-active"
+                                    type="button"
+                                    data-preset="balanced"
+                                    data-pixel="48"
+                                    data-colors="16"
+                                    data-diversity="110">
+                                <strong>균형</strong><span>기본 추천</span>
+                            </button>
+                            <button type="button"
+                                    data-preset="detail"
+                                    data-pixel="76"
+                                    data-colors="36"
+                                    data-diversity="125">
+                                <strong>디테일</strong><span>특징을 풍부하게</span>
+                            </button>
                         </div>
                     </div>
 
@@ -494,14 +544,14 @@
             <article class="latest-update">
                 <div class="update-meta">
                     <time datetime="2026-06-15">2026.06.15</time>
-                    <span>v1.0.1</span>
+                    <span>v1.1</span>
                 </div>
-                <h3>안정성과 모바일 사용 경험을 다듬었습니다</h3>
+                <h3>결과를 비교하고 원하는 느낌을 더 빠르게 찾을 수 있어요</h3>
                 <ul>
-                    <li>업로드 파일명·크기·해상도 안내 추가</li>
-                    <li>슬라이더 조절 중 중복 렌더링 감소</li>
-                    <li>가로·세로 사진의 최대 출력 변을 1200px로 통일</li>
-                    <li>사진 종류별 추천 시작 설정과 테스트 기준 공개</li>
+                    <li>원본 사진과 도트 결과 전환 비교</li>
+                    <li>레트로·균형·디테일 빠른 프리셋</li>
+                    <li>마지막 설정을 현재 브라우저에 자동 저장</li>
+                    <li>초기화 한 번으로 기본 설정 복원</li>
                 </ul>
             </article>
         </section>

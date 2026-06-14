@@ -7,7 +7,10 @@
     dropZone: document.querySelector("[data-drop-zone]"),
     uploadPrompt: document.querySelector("[data-upload-prompt]"),
     canvas: document.querySelector("[data-output-canvas]"),
+    originalCanvas: document.querySelector("[data-original-canvas]"),
     canvasBadge: document.querySelector("[data-canvas-badge]"),
+    previewButtons: document.querySelectorAll("[data-preview-mode]"),
+    presetButtons: document.querySelectorAll("[data-preset]"),
     pixelSize: document.querySelector("[data-pixel-size]"),
     colorCount: document.querySelector("[data-color-count]"),
     colorDiversity: document.querySelector("[data-color-diversity]"),
@@ -24,8 +27,16 @@
     source: null,
     fileName: "pico-dot-sample",
     isSample: true,
-    renderFrame: null
+    renderFrame: null,
+    previewMode: "result"
   };
+
+  var defaultSettings = {
+    pixelWidth: 48,
+    colors: 16,
+    colorDiversity: 110
+  };
+  var settingsStorageKey = "pico-dot-settings-v1";
 
   function setCurrentYear() {
     document.querySelectorAll("[data-current-year]").forEach(function (element) {
@@ -158,6 +169,71 @@
     context.fillRect(550, 119, 10, 10);
 
     return sample;
+  }
+
+  function readSavedSettings() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(settingsStorageKey));
+
+      if (!saved || typeof saved !== "object") {
+        return null;
+      }
+
+      var savedPixelWidth = Number(saved.pixelWidth);
+      var savedColors = Number(saved.colors);
+      var savedColorDiversity = Number(saved.colorDiversity);
+
+      return {
+        pixelWidth: clamp(
+          Number.isFinite(savedPixelWidth) ? savedPixelWidth : defaultSettings.pixelWidth,
+          16,
+          96
+        ),
+        colors: clamp(
+          Number.isFinite(savedColors) ? savedColors : defaultSettings.colors,
+          2,
+          64
+        ),
+        colorDiversity: clamp(
+          Number.isFinite(savedColorDiversity)
+            ? savedColorDiversity
+            : defaultSettings.colorDiversity,
+          0,
+          180
+        )
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveSettings() {
+    try {
+      var settings = getSettings();
+      localStorage.setItem(settingsStorageKey, JSON.stringify({
+        pixelWidth: settings.pixelWidth,
+        colors: settings.colors,
+        colorDiversity: Math.round(settings.colorDiversity * 100)
+      }));
+    } catch (error) {
+      // Converter remains usable when browser storage is unavailable.
+    }
+  }
+
+  function applySettings(settings, shouldSave) {
+    elements.pixelSize.value = String(settings.pixelWidth);
+    elements.colorCount.value = String(settings.colors);
+    elements.colorDiversity.value = String(settings.colorDiversity);
+    updateOutputs();
+    updatePresetState();
+
+    if (shouldSave) {
+      saveSettings();
+    }
+  }
+
+  function restoreSettings() {
+    applySettings(readSavedSettings() || defaultSettings, false);
   }
 
   function getSettings() {
@@ -342,6 +418,71 @@
     elements.canvas.classList.add("is-visible");
     elements.uploadPrompt.classList.add("is-hidden");
     elements.canvasBadge.textContent = state.isSample ? "샘플 미리보기" : "변환 완료";
+    renderOriginalPreview(outputWidth, outputHeight, sourceWidth, sourceHeight);
+    updatePreviewMode();
+  }
+
+  function renderOriginalPreview(outputWidth, outputHeight, sourceWidth, sourceHeight) {
+    if (!elements.originalCanvas || !state.source) {
+      return;
+    }
+
+    var context = elements.originalCanvas.getContext("2d");
+    elements.originalCanvas.width = outputWidth;
+    elements.originalCanvas.height = outputHeight;
+    elements.originalCanvas.style.aspectRatio = sourceWidth + " / " + sourceHeight;
+    context.imageSmoothingEnabled = true;
+    context.clearRect(0, 0, outputWidth, outputHeight);
+    context.drawImage(state.source, 0, 0, outputWidth, outputHeight);
+  }
+
+  function setPreviewMode(mode) {
+    state.previewMode = mode === "original" ? "original" : "result";
+    updatePreviewMode();
+  }
+
+  function updatePreviewMode() {
+    var showOriginal = state.previewMode === "original";
+
+    elements.canvas.classList.toggle("is-visible", !showOriginal);
+    elements.originalCanvas.classList.toggle("is-visible", showOriginal);
+    elements.canvasBadge.textContent = showOriginal
+      ? "원본 사진"
+      : state.isSample ? "샘플 미리보기" : "변환 완료";
+
+    elements.previewButtons.forEach(function (button) {
+      var isActive = button.dataset.previewMode === state.previewMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  }
+
+  function updatePresetState() {
+    var settings = {
+      pixelWidth: Number(elements.pixelSize.value),
+      colors: Number(elements.colorCount.value),
+      colorDiversity: Number(elements.colorDiversity.value)
+    };
+
+    elements.presetButtons.forEach(function (button) {
+      var isActive =
+        Number(button.dataset.pixel) === settings.pixelWidth &&
+        Number(button.dataset.colors) === settings.colors &&
+        Number(button.dataset.diversity) === settings.colorDiversity;
+
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  }
+
+  function applyPreset(button) {
+    applySettings({
+      pixelWidth: Number(button.dataset.pixel),
+      colors: Number(button.dataset.colors),
+      colorDiversity: Number(button.dataset.diversity)
+    }, true);
+    scheduleRender();
+    setStatus(button.querySelector("strong").textContent + " 프리셋을 적용했어요.");
   }
 
   function scheduleRender() {
@@ -415,10 +556,8 @@
     state.fileName = "pico-dot-sample";
     state.isSample = true;
     elements.fileInput.value = "";
-    elements.pixelSize.value = "48";
-    elements.colorCount.value = "16";
-    elements.colorDiversity.value = "110";
-    updateOutputs();
+    applySettings(defaultSettings, true);
+    setPreviewMode("result");
     renderPixelArt();
     setFileSummary(null);
     setStatus("샘플 이미지가 준비되어 있어요.");
@@ -517,14 +656,32 @@
     [elements.pixelSize, elements.colorCount, elements.colorDiversity].forEach(function (control) {
       control.addEventListener("input", function () {
         updateOutputs();
+        updatePresetState();
+        saveSettings();
         scheduleRender();
+      });
+    });
+
+    elements.previewButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        setPreviewMode(button.dataset.previewMode);
+      });
+    });
+
+    elements.presetButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        applyPreset(button);
       });
     });
 
     elements.download.addEventListener("click", downloadImage);
     elements.reset.addEventListener("click", resetMaker);
 
-    resetMaker();
+    restoreSettings();
+    state.source = createSampleCanvas();
+    renderPixelArt();
+    setFileSummary(null);
+    setStatus("샘플 이미지가 준비되어 있어요.");
   }
 
   setCurrentYear();

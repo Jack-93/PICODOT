@@ -635,6 +635,45 @@ button {
   transform: translate(-1px, -1px);
 }
 
+.preview-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.preview-switcher > span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.preview-switcher > div {
+  display: flex;
+  border: 1.5px solid var(--ink);
+}
+
+.preview-button {
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 0;
+  background: var(--white);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.preview-button + .preview-button {
+  border-left: 1.5px solid var(--ink);
+}
+
+.preview-button.is-active {
+  background: var(--lime);
+}
+
 .drop-zone {
   position: relative;
   display: grid;
@@ -714,6 +753,10 @@ button {
   image-rendering: pixelated;
 }
 
+.drop-zone .original-canvas {
+  image-rendering: auto;
+}
+
 .drop-zone canvas.is-visible {
   display: block;
 }
@@ -736,6 +779,65 @@ button {
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1.6;
+}
+
+.preset-group {
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--soft-line);
+}
+
+.preset-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.preset-heading strong {
+  font-size: 14px;
+}
+
+.preset-heading span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.preset-buttons button {
+  min-width: 0;
+  padding: 10px 5px;
+  border: 1.5px solid var(--ink);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.preset-buttons button:hover,
+.preset-buttons button.is-active {
+  background: var(--lime);
+  box-shadow: 2px 2px 0 var(--ink);
+  transform: translate(-1px, -1px);
+}
+
+.preset-buttons strong,
+.preset-buttons span {
+  display: block;
+}
+
+.preset-buttons strong {
+  font-size: 12px;
+}
+
+.preset-buttons span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.35;
 }
 
 .control-group {
@@ -1947,8 +2049,42 @@ input[type="range"]::-moz-range-thumb {
     width: 112px;
   }
 
+  .preview-switcher {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview-switcher > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .preview-button {
+    min-height: 40px;
+  }
+
   .small-button {
     min-height: 40px;
+  }
+
+  .preset-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .preset-buttons button {
+    min-height: 48px;
+    padding: 9px 12px;
+    text-align: left;
+  }
+
+  .preset-buttons strong,
+  .preset-buttons span {
+    display: inline;
+  }
+
+  .preset-buttons span {
+    margin-left: 7px;
   }
 
   .drop-zone {

@@ -14,6 +14,9 @@
     pixelSize: document.querySelector("[data-pixel-size]"),
     colorCount: document.querySelector("[data-color-count]"),
     colorDiversity: document.querySelector("[data-color-diversity]"),
+    colorPalette: document.querySelector("[data-color-palette]"),
+    dithering: document.querySelector("[data-dithering]"),
+    downloadSize: document.querySelector("[data-download-size]"),
     pixelOutput: document.querySelector("[data-pixel-output]"),
     colorOutput: document.querySelector("[data-color-output]"),
     diversityOutput: document.querySelector("[data-diversity-output]"),
@@ -34,9 +37,46 @@
   var defaultSettings = {
     pixelWidth: 48,
     colors: 16,
-    colorDiversity: 110
+    colorDiversity: 110,
+    palette: "auto",
+    dithering: false,
+    outputSize: 1200
   };
   var settingsStorageKey = "pico-dot-settings-v1";
+  var paletteDefinitions = {
+    pico: [
+      [37, 37, 31],
+      [255, 119, 95],
+      [255, 209, 102],
+      [199, 255, 72],
+      [116, 192, 252],
+      [255, 253, 247],
+      [213, 149, 98],
+      [96, 153, 102]
+    ],
+    gameboy: [
+      [15, 56, 15],
+      [48, 98, 48],
+      [139, 172, 15],
+      [155, 188, 15]
+    ],
+    mono: [
+      [28, 28, 28],
+      [92, 92, 92],
+      [174, 174, 174],
+      [245, 245, 245]
+    ],
+    pastel: [
+      [68, 61, 74],
+      [255, 183, 178],
+      [255, 218, 193],
+      [255, 241, 179],
+      [202, 235, 216],
+      [181, 234, 250],
+      [205, 180, 219],
+      [250, 247, 240]
+    ]
+  };
 
   function setCurrentYear() {
     document.querySelectorAll("[data-current-year]").forEach(function (element) {
@@ -182,6 +222,8 @@
       var savedPixelWidth = Number(saved.pixelWidth);
       var savedColors = Number(saved.colors);
       var savedColorDiversity = Number(saved.colorDiversity);
+      var savedOutputSize = Number(saved.outputSize);
+      var savedPalette = typeof saved.palette === "string" ? saved.palette : "auto";
 
       return {
         pixelWidth: clamp(
@@ -200,7 +242,14 @@
             : defaultSettings.colorDiversity,
           0,
           180
-        )
+        ),
+        palette: savedPalette === "auto" || paletteDefinitions[savedPalette]
+          ? savedPalette
+          : defaultSettings.palette,
+        dithering: saved.dithering === true,
+        outputSize: [600, 1200, 2400].includes(savedOutputSize)
+          ? savedOutputSize
+          : defaultSettings.outputSize
       };
     } catch (error) {
       return null;
@@ -213,7 +262,10 @@
       localStorage.setItem(settingsStorageKey, JSON.stringify({
         pixelWidth: settings.pixelWidth,
         colors: settings.colors,
-        colorDiversity: Math.round(settings.colorDiversity * 100)
+        colorDiversity: Math.round(settings.colorDiversity * 100),
+        palette: settings.palette,
+        dithering: settings.dithering,
+        outputSize: settings.outputSize
       }));
     } catch (error) {
       // Converter remains usable when browser storage is unavailable.
@@ -224,6 +276,9 @@
     elements.pixelSize.value = String(settings.pixelWidth);
     elements.colorCount.value = String(settings.colors);
     elements.colorDiversity.value = String(settings.colorDiversity);
+    elements.colorPalette.value = settings.palette;
+    elements.dithering.checked = settings.dithering;
+    elements.downloadSize.value = String(settings.outputSize);
     updateOutputs();
     updatePresetState();
 
@@ -240,7 +295,10 @@
     return {
       pixelWidth: Number(elements.pixelSize.value),
       colors: Number(elements.colorCount.value),
-      colorDiversity: Number(elements.colorDiversity.value) / 100
+      colorDiversity: Number(elements.colorDiversity.value) / 100,
+      palette: elements.colorPalette.value,
+      dithering: elements.dithering.checked,
+      outputSize: Number(elements.downloadSize.value)
     };
   }
 
@@ -349,6 +407,53 @@
     return nearest;
   }
 
+  function applyDithering(imageData, width, height, palette) {
+    var data = imageData.data;
+    var working = new Float32Array(width * height * 3);
+
+    for (var index = 0, workingIndex = 0; index < data.length; index += 4) {
+      working[workingIndex] = data[index];
+      working[workingIndex + 1] = data[index + 1];
+      working[workingIndex + 2] = data[index + 2];
+      workingIndex += 3;
+    }
+
+    function spreadError(x, y, redError, greenError, blueError, weight) {
+      if (x < 0 || x >= width || y < 0 || y >= height) {
+        return;
+      }
+
+      var target = (y * width + x) * 3;
+      working[target] += redError * weight;
+      working[target + 1] += greenError * weight;
+      working[target + 2] += blueError * weight;
+    }
+
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        var pixel = y * width + x;
+        var sourceIndex = pixel * 3;
+        var dataIndex = pixel * 4;
+        var red = clamp(working[sourceIndex], 0, 255);
+        var green = clamp(working[sourceIndex + 1], 0, 255);
+        var blue = clamp(working[sourceIndex + 2], 0, 255);
+        var nearest = findNearestColor(red, green, blue, palette);
+        var redError = red - nearest[0];
+        var greenError = green - nearest[1];
+        var blueError = blue - nearest[2];
+
+        data[dataIndex] = nearest[0];
+        data[dataIndex + 1] = nearest[1];
+        data[dataIndex + 2] = nearest[2];
+
+        spreadError(x + 1, y, redError, greenError, blueError, 7 / 16);
+        spreadError(x - 1, y + 1, redError, greenError, blueError, 3 / 16);
+        spreadError(x, y + 1, redError, greenError, blueError, 5 / 16);
+        spreadError(x + 1, y + 1, redError, greenError, blueError, 1 / 16);
+      }
+    }
+  }
+
   function processPixels(context, width, height, settings) {
     var imageData = context.getImageData(0, 0, width, height);
     var data = imageData.data;
@@ -366,7 +471,15 @@
       data[index + 2] = saturated[2];
     }
 
-    var palette = createPalette(data, settings.colors);
+    var palette = settings.palette === "auto"
+      ? createPalette(data, settings.colors)
+      : paletteDefinitions[settings.palette];
+
+    if (settings.dithering) {
+      applyDithering(imageData, width, height, palette);
+      context.putImageData(imageData, 0, 0);
+      return;
+    }
 
     for (var pixelIndex = 0; pixelIndex < data.length; pixelIndex += 4) {
       var nearest = findNearestColor(
@@ -392,10 +505,11 @@
     var settings = getSettings();
     var sourceWidth = state.source.naturalWidth || state.source.width;
     var sourceHeight = state.source.naturalHeight || state.source.height;
-    var ratio = sourceHeight / sourceWidth;
-    var smallWidth = settings.pixelWidth;
-    var smallHeight = Math.max(1, Math.round(smallWidth * ratio));
-    var outputScale = 1200 / Math.max(sourceWidth, sourceHeight);
+    var sourceLongEdge = Math.max(sourceWidth, sourceHeight);
+    var smallScale = settings.pixelWidth / sourceLongEdge;
+    var smallWidth = Math.max(1, Math.round(sourceWidth * smallScale));
+    var smallHeight = Math.max(1, Math.round(sourceHeight * smallScale));
+    var outputScale = settings.outputSize / sourceLongEdge;
     var outputWidth = Math.max(1, Math.round(sourceWidth * outputScale));
     var outputHeight = Math.max(1, Math.round(sourceHeight * outputScale));
     var smallCanvas = document.createElement("canvas");
@@ -461,14 +575,18 @@
     var settings = {
       pixelWidth: Number(elements.pixelSize.value),
       colors: Number(elements.colorCount.value),
-      colorDiversity: Number(elements.colorDiversity.value)
+      colorDiversity: Number(elements.colorDiversity.value),
+      palette: elements.colorPalette.value,
+      dithering: elements.dithering.checked
     };
 
     elements.presetButtons.forEach(function (button) {
       var isActive =
         Number(button.dataset.pixel) === settings.pixelWidth &&
         Number(button.dataset.colors) === settings.colors &&
-        Number(button.dataset.diversity) === settings.colorDiversity;
+        Number(button.dataset.diversity) === settings.colorDiversity &&
+        button.dataset.palette === settings.palette &&
+        (button.dataset.dither === "true") === settings.dithering;
 
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
@@ -479,9 +597,12 @@
     applySettings({
       pixelWidth: Number(button.dataset.pixel),
       colors: Number(button.dataset.colors),
-      colorDiversity: Number(button.dataset.diversity)
+      colorDiversity: Number(button.dataset.diversity),
+      palette: button.dataset.palette,
+      dithering: button.dataset.dither === "true",
+      outputSize: Number(elements.downloadSize.value)
     }, true);
-    scheduleRender();
+    renderPixelArt();
     setStatus(button.querySelector("strong").textContent + " 프리셋을 적용했어요.");
   }
 
@@ -502,7 +623,12 @@
     }
 
     elements.pixelOutput.textContent = elements.pixelSize.value;
-    elements.colorOutput.textContent = elements.colorCount.value;
+    var selectedPalette = elements.colorPalette.value;
+    var fixedPalette = paletteDefinitions[selectedPalette];
+    elements.colorCount.disabled = Boolean(fixedPalette);
+    elements.colorOutput.textContent = fixedPalette
+      ? fixedPalette.length + " 고정"
+      : elements.colorCount.value;
     elements.diversityOutput.textContent = elements.colorDiversity.value + "%";
   }
 
@@ -570,10 +696,11 @@
     }
 
     var link = document.createElement("a");
-    link.download = state.fileName + "-pixel-art.png";
+    var outputSize = Number(elements.downloadSize.value);
+    link.download = state.fileName + "-pixel-art-" + outputSize + "px.png";
     link.href = elements.canvas.toDataURL("image/png");
     link.click();
-    setStatus("PNG 다운로드를 시작했어요.");
+    setStatus("긴 변 " + outputSize + "px PNG 다운로드를 시작했어요.");
   }
 
   function loadAdSense() {
@@ -659,6 +786,15 @@
         updatePresetState();
         saveSettings();
         scheduleRender();
+      });
+    });
+
+    [elements.colorPalette, elements.dithering, elements.downloadSize].forEach(function (control) {
+      control.addEventListener("change", function () {
+        updateOutputs();
+        updatePresetState();
+        saveSettings();
+        renderPixelArt();
       });
     });
 

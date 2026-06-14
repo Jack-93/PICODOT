@@ -16,13 +16,15 @@
     diversityOutput: document.querySelector("[data-diversity-output]"),
     download: document.querySelector("[data-download]"),
     reset: document.querySelector("[data-reset]"),
-    status: document.querySelector("[data-status]")
+    status: document.querySelector("[data-status]"),
+    fileSummary: document.querySelector("[data-file-summary]")
   };
 
   var state = {
     source: null,
     fileName: "pico-dot-sample",
-    isSample: true
+    isSample: true,
+    renderFrame: null
   };
 
   function setCurrentYear() {
@@ -42,6 +44,35 @@
 
     elements.status.textContent = message;
     elements.status.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function formatFileSize(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) {
+      return "";
+    }
+
+    if (bytes < 1024 * 1024) {
+      return Math.max(1, Math.round(bytes / 1024)) + "KB";
+    }
+
+    return (bytes / (1024 * 1024)).toFixed(1).replace(/\.0$/, "") + "MB";
+  }
+
+  function setFileSummary(file, width, height) {
+    if (!elements.fileSummary) {
+      return;
+    }
+
+    if (!file) {
+      elements.fileSummary.textContent = "샘플 이미지 · 640 × 640px";
+      return;
+    }
+
+    elements.fileSummary.textContent = [
+      file.name,
+      formatFileSize(file.size),
+      width + " × " + height + "px"
+    ].filter(Boolean).join(" · ");
   }
 
   function createSampleCanvas() {
@@ -288,8 +319,9 @@
     var ratio = sourceHeight / sourceWidth;
     var smallWidth = settings.pixelWidth;
     var smallHeight = Math.max(1, Math.round(smallWidth * ratio));
-    var outputWidth = 1200;
-    var outputHeight = Math.round(outputWidth * ratio);
+    var outputScale = 1200 / Math.max(sourceWidth, sourceHeight);
+    var outputWidth = Math.max(1, Math.round(sourceWidth * outputScale));
+    var outputHeight = Math.max(1, Math.round(sourceHeight * outputScale));
     var smallCanvas = document.createElement("canvas");
     var smallContext = smallCanvas.getContext("2d", { willReadFrequently: true });
     var outputContext = elements.canvas.getContext("2d");
@@ -310,6 +342,17 @@
     elements.canvas.classList.add("is-visible");
     elements.uploadPrompt.classList.add("is-hidden");
     elements.canvasBadge.textContent = state.isSample ? "샘플 미리보기" : "변환 완료";
+  }
+
+  function scheduleRender() {
+    if (state.renderFrame !== null) {
+      cancelAnimationFrame(state.renderFrame);
+    }
+
+    state.renderFrame = requestAnimationFrame(function () {
+      state.renderFrame = null;
+      renderPixelArt();
+    });
   }
 
   function updateOutputs() {
@@ -341,10 +384,20 @@
     var objectUrl = URL.createObjectURL(file);
 
     image.onload = function () {
+      var width = image.naturalWidth;
+      var height = image.naturalHeight;
+
+      if (!width || !height || width > 16000 || height > 16000 || width * height > 60000000) {
+        setStatus("이미지가 너무 큽니다. 6천만 화소 이하의 사진을 선택해 주세요.", true);
+        URL.revokeObjectURL(objectUrl);
+        return;
+      }
+
       state.source = image;
       state.fileName = file.name.replace(/\.[^.]+$/, "") || "pico-dot";
       state.isSample = false;
       renderPixelArt();
+      setFileSummary(file, width, height);
       setStatus("사진 변환이 완료됐어요. 설정을 움직여 원하는 느낌을 찾아보세요.");
       URL.revokeObjectURL(objectUrl);
     };
@@ -367,6 +420,7 @@
     elements.colorDiversity.value = "110";
     updateOutputs();
     renderPixelArt();
+    setFileSummary(null);
     setStatus("샘플 이미지가 준비되어 있어요.");
   }
 
@@ -463,7 +517,7 @@
     [elements.pixelSize, elements.colorCount, elements.colorDiversity].forEach(function (control) {
       control.addEventListener("input", function () {
         updateOutputs();
-        renderPixelArt();
+        scheduleRender();
       });
     });
 

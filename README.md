@@ -2,7 +2,7 @@
 
 사진의 색감과 특징을 도트 스타일 픽셀 아트로 변환하는 정적 웹 서비스입니다.
 
-- 현재 버전: `v1.2` (2026-06-15)
+- 현재 버전: `v1.3` (2026-06-15)
 - 서비스: [https://picodot.net](https://picodot.net)
 - 저장소: [Jack-93/PICODOT](https://github.com/Jack-93/PICODOT)
 - 호스팅: Cloudflare Pages
@@ -25,6 +25,8 @@
 - 원본 기반·PICO·게임보이·흑백·파스텔 색상 팔레트
 - 디더링 켜기·끄기
 - 긴 변 기준 600px·1200px·2400px PNG 다운로드
+- 얼굴·귀·눈·표정·무늬를 조합하는 픽셀 캐릭터 스튜디오
+- 캐릭터 색상 설정, 랜덤 생성과 1200px PNG 저장
 - 개인정보처리방침, 서비스 소개, 활용 가이드, 업데이트 안내 제공
 
 ## 개인정보 보호
@@ -43,6 +45,7 @@
 ```text
 PICODOT/
 ├── index.html          # 랜딩 페이지와 픽셀 아트 변환기
+├── studio.html         # 픽셀 캐릭터 조립 스튜디오
 ├── about.html          # 서비스 소개
 ├── privacy.html        # 개인정보처리방침
 ├── updates.html        # 서비스 업데이트 내역
@@ -54,16 +57,25 @@ PICODOT/
 │   ├── css/
 │   │   └── styles.css
 │   ├── images/
+│   │   ├── examples/   # 사진 종류별 예시 이미지
 │   │   ├── favicon.svg
 │   │   └── og-preview.svg
 │   └── js/
 │       ├── app.js      # 이미지 변환 및 UI 동작
-│       └── config.js   # AdSense 설정
+│       ├── config.js   # AdSense 설정
+│       └── studio.js   # 캐릭터 조립 및 PNG 저장
 ├── AGENTS.md           # 코딩 에이전트 작업 지침
 └── README.md
 ```
 
 검색엔진 소유권 확인용 HTML 파일도 저장소 루트에 포함되어 있습니다.
+
+## 예시 이미지
+
+- 인물 예시는 기존 캐릭터를 복제하지 않은 오리지널 생성 이미지입니다.
+- 고양이 사진: [The Lucky Neko / Unsplash](https://unsplash.com/photos/orange-tabby-cat-AH7JYgyAlqA)
+- 풍경 사진: [Lesly Derksen / Unsplash](https://unsplash.com/photos/a-mountain-range-with-a-lake-in-the-foreground-VFQZCjv935A)
+- Unsplash 사진은 [Unsplash License](https://unsplash.com/license)에 따라 사용합니다.
 
 ## 로컬 실행
 

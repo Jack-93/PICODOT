@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#c7ff48">
+    <meta
+      name="description"
+      content="얼굴, 귀, 눈, 무늬와 색상을 조합해 나만의 픽셀 캐릭터를 만들고 PNG로 저장하세요."
+    >
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://picodot.net/studio">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:site_name" content="PICO DOT">
+    <meta property="og:url" content="https://picodot.net/studio">
+    <meta property="og:title" content="PICODOT STUDIO | 픽셀 캐릭터 만들기">
+    <meta
+      property="og:description"
+      content="고양이 템플릿의 얼굴, 귀, 눈, 입, 무늬와 색상을 조합해 나만의 픽셀 캐릭터를 만들어 보세요."
+    >
+    <meta property="og:image" content="https://picodot.net/assets/images/og-preview.svg">
+    <title>PICODOT STUDIO | 픽셀 캐릭터 만들기</title>
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body class="studio-page">
+    <a class="skip-link" href="#studio-maker">캐릭터 만들기로 바로가기</a>
+
+    <header class="site-header studio-header">
+      <a class="brand" href="index.html" aria-label="PICODOT 홈">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span>PICODOT</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="주요 메뉴">
+        <a href="index.html#pixel-maker">사진 픽셀 아트</a>
+        <a class="is-current" href="studio.html" aria-current="page">캐릭터 만들기</a>
+        <a href="index.html#guide">활용 가이드</a>
+        <a href="about.html">사이트 소개</a>
+        <a href="updates.html">서비스 업데이트</a>
+        <a href="privacy.html">개인정보처리방침</a>
+      </nav>
+
+      <a class="header-cta" href="index.html#pixel-maker">사진 변환하기</a>
+    </header>
+
+    <main id="studio-maker">
+      <section class="studio-intro section-shell" aria-labelledby="studio-title">
+        <div>
+          <p class="eyebrow"><span aria-hidden="true">✦</span> 부품을 골라 만드는 픽셀 친구</p>
+          <h1 id="studio-title">PICODOT<br><span class="highlight">CHARACTER STUDIO</span></h1>
+          <p>
+            얼굴부터 귀, 눈, 무늬와 색상까지 하나씩 골라보세요.
+            그림을 그리지 않아도 나만의 픽셀 고양이가 완성됩니다.
+          </p>
+        </div>
+        <ul class="studio-points" aria-label="스튜디오 특징">
+          <li><strong>01</strong><span>회원가입 없이 바로 조립</span></li>
+          <li><strong>02</strong><span>랜덤 버튼으로 빠르게 탐색</span></li>
+          <li><strong>03</strong><span>1200px PNG 무료 저장</span></li>
+        </ul>
+      </section>
+
+      <section class="studio-workspace section-shell" id="character-maker" aria-label="픽셀 캐릭터 조립기">
+        <div class="studio-preview-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">01</span>
+              <h2>내 캐릭터</h2>
+            </div>
+            <span class="studio-live-badge">LIVE PREVIEW</span>
+          </div>
+
+          <div class="studio-canvas-frame">
+            <div class="studio-window-bar">
+              <div aria-hidden="true"><span></span><span></span><span></span></div>
+              <strong>picodot.studio</strong>
+            </div>
+            <canvas
+              width="1200"
+              height="1200"
+              data-studio-canvas
+              aria-label="조립한 픽셀 고양이 미리보기"
+            ></canvas>
+            <span class="studio-sticker studio-sticker-original">MY CHARACTER</span>
+            <span class="studio-sticker studio-sticker-pixel">PIXEL!</span>
+          </div>
+
+          <div class="studio-preview-actions">
+            <button class="button button-outline" type="button" data-studio-random>
+              랜덤 만들기 <span aria-hidden="true">↻</span>
+            </button>
+            <button class="button button-dark" type="button" data-studio-download>
+              PNG 저장 <span aria-hidden="true">↓</span>
+            </button>
+          </div>
+          <p class="status-message" data-studio-status role="status" aria-live="polite">
+            원하는 부품과 색상을 골라보세요.
+          </p>
+        </div>
+
+        <aside class="studio-controls" aria-label="캐릭터 부품 설정">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">02</span>
+              <h2>부품 고르기</h2>
+            </div>
+            <button class="small-button" type="button" data-studio-reset>초기화</button>
+          </div>
+
+          <div class="studio-control-grid">
+            <label>
+              <span>얼굴 모양</span>
+              <select data-studio-setting="face">
+                <option value="round">동글동글</option>
+                <option value="square">네모네모</option>
+                <option value="oval">길쭉하게</option>
+              </select>
+            </label>
+            <label>
+              <span>귀 모양</span>
+              <select data-studio-setting="ears">
+                <option value="triangle">쫑긋 귀</option>
+                <option value="round">둥근 귀</option>
+                <option value="folded">접힌 귀</option>
+              </select>
+            </label>
+            <label>
+              <span>눈 모양</span>
+              <select data-studio-setting="eyes">
+                <option value="square">네모 눈</option>
+                <option value="sleepy">졸린 눈</option>
+                <option value="sparkle">반짝 눈</option>
+              </select>
+            </label>
+            <label>
+              <span>표정</span>
+              <select data-studio-setting="mouth">
+                <option value="tiny">새침하게</option>
+                <option value="smile">방긋 웃기</option>
+                <option value="tongue">메롱하기</option>
+              </select>
+            </label>
+            <label>
+              <span>털 무늬</span>
+              <select data-studio-setting="pattern">
+                <option value="stripes">줄무늬</option>
+                <option value="spots">점박이</option>
+                <option value="split">반반 무늬</option>
+                <option value="none">무늬 없음</option>
+              </select>
+            </label>
+            <label>
+              <span>액세서리</span>
+              <select data-studio-setting="accessory">
+                <option value="none">없음</option>
+                <option value="bow">리본</option>
+                <option value="glasses">안경</option>
+                <option value="crown">왕관</option>
+              </select>
+            </label>
+          </div>
+
+          <fieldset class="studio-colors">
+            <legend>색상 고르기</legend>
+            <label>
+              <span>털 색</span>
+              <input type="color" value="#d99a68" data-studio-color="fur">
+            </label>
+            <label>
+              <span>무늬 색</span>
+              <input type="color" value="#f3c184" data-studio-color="patternColor">
+            </label>
+            <label>
+              <span>눈 색</span>
+              <input type="color" value="#c7ff48" data-studio-color="eyeColor">
+            </label>
+            <label>
+              <span>포인트</span>
+              <input type="color" value="#ff775f" data-studio-color="accent">
+            </label>
+            <label>
+              <span>배경 색</span>
+              <input type="color" value="#ffe2a8" data-studio-color="background">
+            </label>
+          </fieldset>
+
+          <div class="studio-name-control">
+            <label for="character-name">캐릭터 이름</label>
+            <input
+              id="character-name"
+              type="text"
+              maxlength="16"
+              value="MY PICO CAT"
+              data-studio-name
+            >
+            <small>이름은 PNG 아래쪽 라벨에 표시됩니다.</small>
+          </div>
+        </aside>
+      </section>
+
+      <section class="studio-note section-shell" id="studio-note">
+        <div>
+          <p class="section-kicker">HOW TO PLAY</p>
+          <h2>다 이뻐요 일단 만들어보세요!</h2>
+        </div>
+      </section>
+    </main>
+
+    <footer class="document-footer studio-footer" aria-label="페이지 바로가기">
+      <a href="index.html">← 홈으로 돌아가기</a>
+      <a href="index.html#pixel-maker">사진 픽셀 아트</a>
+      <a href="about.html">사이트 소개</a>
+    </footer>
+
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/studio.js"></script>
+  </body>
+</html>

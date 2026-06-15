@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#c7ff48">
     <meta
       name="description"
-      content="사람, 반려동물, 사물 사진 등 여러분의 사진을 브라우저에서 바로 감각적인 도트 픽셀 아트로 변환하고 PNG로 다운로드할 수 있습니다."
+      content="고양이 사진의 색감을 분석해 픽셀 캐릭터를 만들거나, 캐릭터를 직접 조립하고 사진 전체를 도트화할 수 있는 무료 브라우저 도구입니다."
     >
     <meta
       name="keywords"
@@ -21,20 +21,20 @@
     <meta property="og:title" content="PICO DOT - 사진을 나만의 픽셀 아트로">
     <meta
       property="og:description"
-      content="사진 한 장으로 색감과 무늬를 살린 도트 스타일 픽셀 아트를 만들어 보세요."
+      content="사진을 고르고 색감과 무늬를 살린 도트 스타일 픽셀 아트를 만들어 보세요."
     >
     <meta property="og:image" content="https://picodot.net/assets/images/og-preview.svg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="PICO DOT 사진 픽셀 아트 변환 서비스">
+    <meta property="og:image:alt" content="PICODOT 사진 픽셀 아트 변환 서비스">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="PICO DOT - 사진을 나만의 픽셀 아트로">
+    <meta name="twitter:title" content="PICODOT - 사진을 나만의 픽셀 아트로">
     <meta
       name="twitter:description"
       content="설치 없이 브라우저에서 사진을 픽셀 아트로 바꾸고 바로 다운로드하세요."
     >
     <meta name="twitter:image" content="https://picodot.net/assets/images/og-preview.svg">
-    <title>PICO DOT | 사진을 무료 픽셀 아트로 변환</title>
+    <title>PICODOT | 사진으로 무료 픽셀 아트 만들기</title>
     <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/css/styles.css">
     <script type="application/ld+json">
@@ -46,16 +46,18 @@
         "applicationCategory": "DesignApplication",
         "operatingSystem": "Any",
         "inLanguage": "ko",
-        "description": "사진을 브라우저에서 픽셀 아트로 변환하고 PNG로 다운로드하는 무료 도구",
+        "description": "사진 색감 기반 픽셀 캐릭터, 캐릭터 조립과 사진 도트화를 제공하는 무료 브라우저 도구",
         "offers": {
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "KRW"
         },
         "featureList": [
+          "고양이 사진 대표 색상 분석",
+          "사진 색감 기반 픽셀 캐릭터 생성",
+          "픽셀 캐릭터 직접 조립",
+          "사진 전체 도트화",
           "로컬 브라우저 이미지 처리",
-          "픽셀 크기 조절",
-          "색상 수와 색감 조절",
           "PNG 다운로드"
         ]
       }
@@ -73,8 +75,34 @@
       </a>
 
       <nav class="desktop-nav" aria-label="주요 메뉴">
-        <a href="#pixel-maker">픽셀 아트 만들기</a>
-        <a href="studio.html">캐릭터 만들기</a>
+        <div class="feature-menu" data-feature-menu>
+          <button
+            class="feature-menu-trigger"
+            type="button"
+            aria-expanded="false"
+            aria-controls="home-feature-menu"
+            data-feature-menu-trigger
+          >
+            기능 <span aria-hidden="true">⌄</span>
+          </button>
+          <div class="feature-menu-panel" id="home-feature-menu" data-feature-menu-panel>
+            <a href="#pixel-maker">
+              <span aria-hidden="true">'<'</span>
+              <strong>픽셀 아트 만들기</strong>
+              <small>사진의 색감을 살리기! </small>
+            </a>
+            <a href="studio.html">
+              <span aria-hidden="true">'ㅅ'</span>
+              <strong>나만의 캐릭터 만들기</strong>
+              <small>부품과 색상을 내 맘대로!</small>
+            </a>
+            <a href="#photo-dot-maker">
+              <span aria-hidden="true">'o'</span>
+              <strong>사진 도트화</strong>
+              <small>원본 사진을 그대로 도트화</small>
+            </a>
+          </div>
+        </div>
         <a href="#features">기능 소개</a>
         <a href="#guide">활용 가이드</a>
         <a href="#faq">자주 묻는 질문</a>
@@ -89,18 +117,18 @@
     <main id="top">
         <section class="hero section-shell" aria-labelledby="hero-title">
             <div class="hero-copy">
-                <p class="eyebrow"><span aria-hidden="true">✦</span> 사진 한 장이면 충분해요</p>
+                <p class="eyebrow"><span aria-hidden="true">✦</span>원하는 사진 한 장!</p>
                 <h1 id="hero-title">
-                    익숙한 사진을<br>
-                    <span class="highlight">조금 특별한 도트</span>로
+                    사진 속 특징을<br>
+                    <span class="highlight">나만의 <br >픽셀 캐릭터로</span>
                 </h1>
                 <p class="hero-description">
-                    사람, 고양이, 강아지, 좋아하는 사물까지.<br>
-                    원본의 색감과 무늬를 살린 픽셀 아트를 브라우저에서 바로 만들어 보세요.
+                    만들고 싶은 대로 만들어 보세요! <br>
+                    다 좋아요! 다 이쁠거에용 '< '
                 </p>
                 <div class="hero-actions">
                     <a class="button button-primary" href="#pixel-maker">
-                        지금 변환하기
+                        픽셀 아트 만들기
                         <span aria-hidden="true">↘</span>
                     </a>
                     <a class="text-link" href="#how-it-works">어떻게 작동하나요?</a>
@@ -112,7 +140,7 @@
                 </ul>
             </div>
 
-            <div class="hero-art" aria-label="고양이 사진이 픽셀 아트로 변하는 예시">
+            <div class="hero-art" aria-label="우리 고양이 사진이 픽셀 아트로 변하는 예시">
                 <div class="floating-label label-original">ORIGINAL</div>
                 <div class="floating-label label-result">PIXEL!</div>
                 <div class="pixel-window">
@@ -153,11 +181,111 @@
             </div>
         </aside>
 
-        <section class="maker-section" id="pixel-maker" aria-labelledby="maker-title">
+        <section class="photo-art-section" id="pixel-maker" aria-labelledby="photo-art-title">
             <div class="section-heading">
-                <p class="section-kicker">PIXEL MAKER</p>
-                <h2 id="maker-title">내 사진으로 직접 만들어 보세요</h2>
-                <p>이미지는 외부 서버로 전송되지 않고 현재 브라우저 안에서만 처리됩니다.</p>
+                <p class="section-kicker">PHOTO TO PIXEL CHARACTER</p>
+                <h2 id="photo-art-title">사진의 색감으로<br>픽셀 아트를 만들어요</h2>
+                <p>
+                    고양이 사진에서 대표 털색과 밝은 색, 어두운 색을 찾아 캐릭터 템플릿에 적용합니다.
+                    <br>사진과 결과는 현재 브라우저 안에서만 처리됩니다 .
+                </p>
+            </div>
+
+            <div class="photo-art-app">
+                <div class="photo-art-preview-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="step-number">01</span>
+                            <h3>픽셀 아트 (샘플 - 개발자네 애기)</h3>
+                        </div>
+                        <div class="panel-actions">
+                            <button class="small-button small-button-primary" type="button" data-photo-art-file>
+                                사진 고르기
+                            </button>
+                            <button class="small-button" type="button" data-photo-art-reset>샘플로 초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="photo-art-drop" data-photo-art-drop>
+                        <input
+                            id="photo-art-upload"
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            data-photo-art-input
+                        >
+                        <canvas
+                            data-photo-art-canvas
+                            aria-label="사진의 색감을 반영한 픽셀 고양이 미리보기"
+                        ></canvas>
+                        <span class="photo-art-badge">PHOTO → PIXEL</span>
+                    </div>
+                    <p class="file-summary" data-photo-art-summary>
+                        샘플 픽셀 고양이 · 1200 × 1200px
+                    </p>
+                </div>
+
+                <aside class="photo-art-controls" aria-label="사진 기반 픽셀 아트 설정">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="step-number">02</span>
+                            <h3>분석 결과 다듬기</h3>
+                        </div>
+                    </div>
+
+                    <div class="photo-art-source-card">
+                        <div>
+                            <span class="photo-art-source-empty" data-photo-art-source-empty>샘플</span>
+                            <img data-photo-art-source hidden alt="">
+                        </div>
+                        <p>
+                            <strong>사진은 어디에도 전송되지 않아요.</strong>
+                            얼굴이 크고 털색이 선명한 사진일수록 분석이 안정적입니다.
+                        </p>
+                    </div>
+
+                    <div class="photo-art-selects">
+                        <label>
+                            <span>무늬</span>
+                            <select data-photo-art-setting="pattern">
+                                <option value="stripes">줄무늬</option>
+                                <option value="spots">점박이</option>
+                                <option value="none">무늬 없음</option>
+                            </select>
+                        </label>
+                        <label>
+                            <span>표정</span>
+                            <select data-photo-art-setting="expression">
+                                <option value="sleepy">나른하게</option>
+                                <option value="soft">차분하게</option>
+                                <option value="bright">반짝이게</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <fieldset class="photo-art-colors">
+                        <legend>분석된 색상</legend>
+                        <label><span>털</span><input type="color" value="#f3a24d" data-photo-art-color="fur"></label>
+                        <label><span>흰 털</span><input type="color" value="#fff8ea" data-photo-art-color="light"></label>
+                        <label><span>눈</span><input type="color" value="#4f4d28" data-photo-art-color="dark"></label>
+                        <label><span>코</span><input type="color" value="#ef8e89" data-photo-art-color="accent"></label>
+                        <label><span>배경</span><input type="color" value="#ffe0a8" data-photo-art-color="background"></label>
+                    </fieldset>
+
+                    <button class="button button-dark download-button" type="button" data-photo-art-download>
+                        1200px PNG 저장 <span aria-hidden="true">↓</span>
+                    </button>
+                    <p class="status-message" data-photo-art-status role="status" aria-live="polite">
+                        샘플 미리보기가 준비되어 있어요.
+                    </p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="maker-section" id="photo-dot-maker" aria-labelledby="maker-title">
+            <div class="section-heading">
+                <p class="section-kicker">PHOTO DOT CONVERTER</p>
+                <h2 id="maker-title">사진을 그대로 도트화해 보세요</h2>
+                <p>원본 구도와 형태를 유지한 채 사진 전체를 저해상도 픽셀 이미지로 변환합니다.</p>
             </div>
 
             <div class="maker-app">
@@ -165,7 +293,7 @@
                     <div class="panel-heading">
                         <div>
                             <span class="step-number">01</span>
-                            <h3>사진 선택</h3>
+                            <h3>도트화할 사진 선택</h3>
                         </div>
                         <div class="panel-actions">
                             <button class="small-button small-button-primary" type="button" data-file-button>
@@ -219,7 +347,7 @@
                     <div class="panel-heading">
                         <div>
                             <span class="step-number">02</span>
-                            <h3>느낌 조절</h3>
+                            <h3>도트화 설정</h3>
                         </div>
                     </div>
 
@@ -395,7 +523,7 @@
                     <span class="feature-index">01</span>
                     <div class="feature-icon" aria-hidden="true">▦</div>
                     <h3>사진의 느낌은 그대로</h3>
-                    <p>원본의 주요 색감과 명암, 무늬를 단순한 도트 감성으로 다시 표현합니다.</p>
+                    <p>고양이 사진의 털색과 밝은 색, 눈색을 찾아 픽셀 캐릭터에 자동으로 적용합니다.</p>
                 </article>
                 <article class="feature-card">
                     <span class="feature-index">02</span>
@@ -428,8 +556,8 @@
                 <li>
                     <span class="big-number">2</span>
                     <div>
-                        <h3>취향에 맞게 조절해요</h3>
-                        <p>도트 크기, 색상 수, 색감을 움직이며 원하는 분위기를 찾으세요.</p>
+                        <h3>분석 결과를 다듬어요</h3>
+                        <p>털색, 무늬와 표정을 확인하고 원하는 분위기로 조금 더 조절하세요.</p>
                     </div>
                 </li>
                 <li>
@@ -634,14 +762,14 @@
             <article class="latest-update">
                 <div class="update-meta">
                     <time datetime="2026-06-15">2026.06.15</time>
-                    <span>v1.3</span>
+                    <span>v1.4</span>
                 </div>
-                <h3>부품을 조합하는 픽셀 캐릭터 스튜디오를 열었습니다</h3>
+                <h3>사진의 색감으로 픽셀 캐릭터를 만드는 기능을 추가했습니다</h3>
                 <ul>
-                    <li>얼굴·귀·눈·표정·무늬 조합</li>
-                    <li>털과 배경 등 다섯 가지 색상 설정</li>
-                    <li>랜덤 캐릭터와 설정 자동 저장</li>
-                    <li>1200px PNG 무료 다운로드</li>
+                    <li>고양이 사진의 대표 털색과 밝은 색 분석</li>
+                    <li>분석 색상을 픽셀 고양이 템플릿에 자동 적용</li>
+                    <li>세 가지 제작 기능을 드롭다운 메뉴로 분리</li>
+                    <li>색상·무늬·표정 수정과 1200px PNG 저장</li>
                 </ul>
             </article>
         </section>
@@ -662,7 +790,7 @@
             <div class="faq-list">
                 <details>
                     <summary>정말 무료인가요?<span aria-hidden="true">+</span></summary>
-                    <p>현재 제공되는 사진 변환과 PNG 다운로드 기능은 회원가입 없이 무료로 사용할 수 있습니다.</p>
+                    <p>현재 제공되는 픽셀 아트 만들기, 캐릭터 만들기, 사진 도트화와 PNG 저장은 회원가입 없이 무료로 사용할 수 있습니다.</p>
                 </details>
                 <details>
                     <summary>업로드한 사진은 저장되나요?<span aria-hidden="true">+</span></summary>
@@ -717,5 +845,6 @@
 
     <script src="assets/js/config.js"></script>
     <script src="assets/js/app.js"></script>
+    <script src="assets/js/photo-art.js"></script>
   </body>
 </html>

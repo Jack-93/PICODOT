@@ -36,15 +36,41 @@
       </a>
 
       <nav class="desktop-nav" aria-label="주요 메뉴">
-        <a href="index.html#pixel-maker">사진 픽셀 아트</a>
-        <a class="is-current" href="studio.html" aria-current="page">캐릭터 만들기</a>
+        <div class="feature-menu is-current" data-feature-menu>
+          <button
+            class="feature-menu-trigger"
+            type="button"
+            aria-expanded="false"
+            aria-controls="studio-feature-menu"
+            data-feature-menu-trigger
+          >
+            기능 <span aria-hidden="true">⌄</span>
+          </button>
+          <div class="feature-menu-panel" id="studio-feature-menu" data-feature-menu-panel>
+              <a href="index.html#pixel-maker">
+                  <span aria-hidden="true">'<'</span>
+                  <strong>픽셀 아트 만들기</strong>
+                  <small>사진의 색감을 살리기! </small>
+              </a>
+              <a href="studio.html">
+                  <span aria-hidden="true">'ㅅ'</span>
+                  <strong>나만의 캐릭터 만들기</strong>
+                  <small>부품과 색상을 내 맘대로!</small>
+              </a>
+              <a href="#photo-dot-maker">
+                  <span aria-hidden="true">'o'</span>
+                  <strong>사진 도트화</strong>
+                  <small>원본 사진을 그대로 도트화</small>
+              </a>
+          </div>
+        </div>
         <a href="index.html#guide">활용 가이드</a>
         <a href="about.html">사이트 소개</a>
         <a href="updates.html">서비스 업데이트</a>
         <a href="privacy.html">개인정보처리방침</a>
       </nav>
 
-      <a class="header-cta" href="index.html#pixel-maker">사진 변환하기</a>
+      <a class="header-cta" href="index.html#pixel-maker">픽셀 아트 만들기</a>
     </header>
 
     <main id="studio-maker">
@@ -212,7 +238,7 @@
 
     <footer class="document-footer studio-footer" aria-label="페이지 바로가기">
       <a href="index.html">← 홈으로 돌아가기</a>
-      <a href="index.html#pixel-maker">사진 픽셀 아트</a>
+      <a href="index.html#pixel-maker">픽셀 아트 만들기</a>
       <a href="about.html">사이트 소개</a>
     </footer>
 

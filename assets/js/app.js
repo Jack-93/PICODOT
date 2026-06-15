@@ -97,6 +97,66 @@
     elements.status.classList.toggle("is-error", Boolean(isError));
   }
 
+  function bindFeatureMenus() {
+    var menus = document.querySelectorAll("[data-feature-menu]");
+
+    menus.forEach(function (menu) {
+      var trigger = menu.querySelector("[data-feature-menu-trigger]");
+
+      if (!trigger) {
+        return;
+      }
+
+      trigger.addEventListener("click", function () {
+        var willOpen = !menu.classList.contains("is-open");
+
+        menus.forEach(function (otherMenu) {
+          otherMenu.classList.remove("is-open");
+          var otherTrigger = otherMenu.querySelector("[data-feature-menu-trigger]");
+          if (otherTrigger) {
+            otherTrigger.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        menu.classList.toggle("is-open", willOpen);
+        trigger.setAttribute("aria-expanded", String(willOpen));
+      });
+
+      menu.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          menu.classList.remove("is-open");
+          trigger.setAttribute("aria-expanded", "false");
+        });
+      });
+    });
+
+    document.addEventListener("click", function (event) {
+      menus.forEach(function (menu) {
+        if (menu.contains(event.target)) {
+          return;
+        }
+        menu.classList.remove("is-open");
+        var trigger = menu.querySelector("[data-feature-menu-trigger]");
+        if (trigger) {
+          trigger.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") {
+        return;
+      }
+      menus.forEach(function (menu) {
+        menu.classList.remove("is-open");
+        var trigger = menu.querySelector("[data-feature-menu-trigger]");
+        if (trigger) {
+          trigger.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
+  }
+
   function formatFileSize(bytes) {
     if (!Number.isFinite(bytes) || bytes <= 0) {
       return "";
@@ -821,6 +881,7 @@
   }
 
   setCurrentYear();
+  bindFeatureMenus();
   bindMakerEvents();
   loadAdSense();
 })();
